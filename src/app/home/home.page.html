@@ -1,20 +1,41 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="showNearby()">
+        <ion-icon name="location" slot="start"></ion-icon> Nearby</ion-button
+      >
+    </ion-buttons>
+
+    <ion-title> Supa Stores </ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="addStore()">
+        <ion-icon name="add" slot="start"></ion-icon> Store</ion-button
+      >
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+<ion-content>
+  <div class="container">
+    <capacitor-google-map #map></capacitor-google-map>
   </div>
+
+  <ion-modal
+    [isOpen]="selectedMarker !== null"
+    [breakpoints]="[0, 0.4, 1]"
+    [initialBreakpoint]="0.4"
+    (didDismiss)="selectedMarker = null;"
+  >
+    <ng-template>
+      <ion-content class="ion-padding">
+        <ion-label class="ion-texst-wrap">
+          <h1>{{selectedStore?.name}}</h1>
+          <ion-note>{{selectedStore?.description}}</ion-note>
+        </ion-label>
+        <div class="ion-text-center ion-margin-top">
+          <img [src]="selectedStore?.image" *ngIf="selectedStore?.image" />
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
 </ion-content>

@@ -11,6 +11,14 @@ const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
+  {
+    path: 'store',
+    loadChildren: () => import('./store/store.module').then( m => m.StorePageModule)
+  },
+  {
+    path: 'nearby',
+    loadChildren: () => import('./nearby/nearby.module').then( m => m.NearbyPageModule)
+  },
 ];
 
 @NgModule({

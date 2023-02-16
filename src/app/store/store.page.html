@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-button (click)="modalCtrl.dismiss()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Add Store</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-input
+    label="Store name"
+    label-placement="stacked"
+    placeholder="Joeys"
+    [(ngModel)]="store.name"
+  />
+  <ion-textarea
+    rows="3"
+    label="Store description"
+    label-placement="stacked"
+    placeholder="Some about text"
+    [(ngModel)]="store.description"
+  />
+  <ion-input
+    type="number"
+    label="Latitude"
+    label-placement="stacked"
+    [(ngModel)]="store.lat"
+  />
+  <ion-input
+    type="number"
+    label="Longitude"
+    label-placement="stacked"
+    [(ngModel)]="store.long"
+  />
+  <ion-input
+    label="Select store image"
+    (ionChange)="imageSelected($event)"
+    type="file"
+    accept="image/*"
+  ></ion-input>
+
+  <ion-button
+    expand="full"
+    (click)="addStore()"
+    [disabled]="!store.lat || !store.long || store.name === ''"
+    >Add Store</ion-button
+  >
+</ion-content>
