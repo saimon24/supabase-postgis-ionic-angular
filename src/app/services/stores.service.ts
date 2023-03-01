@@ -61,35 +61,16 @@ export class StoresService {
     }
   }
 
-  // Load data from Supabase database
-  async loadStoreInformation(id: number) {
-    const { data } = await this.supabase
-      .from('stores')
-      .select('*')
-      .match({ id })
-      .single();
-    return data;
-  }
-
   async getStoreImage(id: number) {
     // Get image for a store and transform it automatically!
     return this.supabase.storage
       .from('stores')
-      .download(`images/${id}.png`, {
+      .getPublicUrl(`images/${id}.png`, {
         transform: {
           width: 300,
           resize: 'contain',
         },
-      })
-      .then((res) => {
-        if (!res.data) {
-          return null;
-        }
-
-        const url = URL.createObjectURL(res.data!);
-        const imageUrl = this.sanitizer.bypassSecurityTrustUrl(url);
-        return imageUrl;
-      });
+      }).data.publicUrl;
   }
 
   // Get all places in a box of coordinates
@@ -105,6 +86,16 @@ export class StoresService {
       max_lat,
       max_long,
     });
+    return data;
+  }
+
+  // Load data from Supabase database
+  async loadStoreInformation(id: number) {
+    const { data } = await this.supabase
+      .from('stores')
+      .select('*')
+      .match({ id })
+      .single();
     return data;
   }
 }

@@ -1,14 +1,13 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
-import { Geolocation } from '@capacitor/geolocation';
-
 import { GoogleMap, Marker } from '@capacitor/google-maps';
 import { LatLngBounds } from '@capacitor/google-maps/dist/typings/definitions';
 import { ModalController } from '@ionic/angular';
 import { BehaviorSubject, debounce, interval } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { StoresService, StoreResult } from '../services/stores.service';
-import { StorePage } from '../store/store.page';
+import { environment } from 'src/environments/environment';
 import { NearbyPage } from '../nearby/nearby.page';
+import { StoreResult, StoresService } from '../services/stores.service';
+import { StorePage } from '../store/store.page';
+import { Geolocation } from '@capacitor/geolocation';
 
 export interface StoreMarker {
   markerId: string;
@@ -35,20 +34,6 @@ export class HomePage {
 
   ionViewDidEnter() {
     this.createMap();
-  }
-
-  async showNearby() {
-    const modal = await this.modalCtrl.create({
-      component: NearbyPage,
-    });
-    modal.present();
-  }
-
-  async addStore() {
-    const modal = await this.modalCtrl.create({
-      component: StorePage,
-    });
-    modal.present();
   }
 
   async createMap() {
@@ -81,6 +66,21 @@ export class HomePage {
     this.loadUserLocation();
   }
 
+  async updateStoresInView() {
+    const bounds = await this.map.getMapBounds();
+
+    // Get stores in our bounds using PostGIS
+    const stores = await this.storesService.getStoresInView(
+      bounds.southwest.lat,
+      bounds.southwest.lng,
+      bounds.northeast.lat,
+      bounds.northeast.lng
+    );
+
+    // Update markers for elements
+    this.addMarkers(stores);
+  }
+
   async loadUserLocation() {
     // Get location with Capacitor Geolocation plugin
     const coordinates = await Geolocation.getCurrentPosition();
@@ -95,21 +95,6 @@ export class HomePage {
         zoom: 14,
       });
     }
-  }
-
-  async updateStoresInView() {
-    const bounds = await this.map.getMapBounds();
-
-    // Get stores in our bounds using PostGIS
-    const stores = await this.storesService.getStoresInView(
-      bounds.southwest.lat,
-      bounds.southwest.lng,
-      bounds.northeast.lat,
-      bounds.northeast.lng
-    );
-
-    // Update markers for elements
-    this.addMarkers(stores);
   }
 
   async addMarkers(stores: StoreResult[]) {
@@ -151,6 +136,10 @@ export class HomePage {
       };
     });
 
+    this.addMarkerClicks();
+  }
+
+  addMarkerClicks() {
     // Handle marker clicks
     this.map.setOnMarkerClickListener(async (marker) => {
       // Find our local object based on the marker ID
@@ -169,10 +158,25 @@ export class HomePage {
         const img = await this.storesService.getStoreImage(
           this.selectedStore!.id
         );
+
         if (img) {
           this.selectedStore!.image = img;
         }
       }
     });
+  }
+
+  async showNearby() {
+    const modal = await this.modalCtrl.create({
+      component: NearbyPage,
+    });
+    modal.present();
+  }
+
+  async addStore() {
+    const modal = await this.modalCtrl.create({
+      component: StorePage,
+    });
+    modal.present();
   }
 }
